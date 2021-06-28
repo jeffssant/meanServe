@@ -1,1 +1,1 @@
-console.log('Node')
+console.log('Node as')
