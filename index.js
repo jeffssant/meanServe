@@ -7,6 +7,9 @@ require('dotenv').config();
 //Criar o servidor/aplicação Express
 const app = express();
 
+//Diretorio Publico
+app.use(express.static('public'))
+
 //CORS
 app.use(cors());
 
