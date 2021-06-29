@@ -57,22 +57,68 @@ const newuser = async(req, res = response) => {
 }
 
 
-const loginUser = (req, res = response) => {
+const loginUser = async(req, res = response) => {
     
     const {email, password} = req.body;
-    console.log(email, password);
-    return res.json({
-        ok: true,
-        msg: "Login de usuario / "
-    })
+
+    try {
+
+        // Criar Objeto User a partir do DB
+        const dbUser = await User.findOne({email});
+        
+        if(!dbUser){
+            return res.status(400).json({
+                ok: false,
+                msg: 'Email invalido'
+            })
+        }
+
+        // Confirmar senha
+        const ValidPassword = bcrypt.compareSync(password, dbUser.password);
+
+        if(!ValidPassword){
+            
+            return res.status(400).json({
+                ok: false,
+                msg: 'Senha invalida'
+            })
+           
+        }
+
+        //JWT
+        const token = await JWTGen(dbUser.id, dbUser.name);
+
+        // Resposta
+        return res.status(201).json({
+            ok: true,
+            uid: dbUser.id,
+            name: dbUser.name,
+            token
+        })
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: "Entre em contato com o administrado do sistema"
+        })
+    }
 
 }
 
-const renewTk = (req, res = response) => {
+const renewTk = async(req, res = response) => {
+
+    const {uid, name} = req;
+
+    //JWT
+    const token = await JWTGen(uid, name);
     
     return res.json({
         ok: true,
-        msg: "Renew /"
+        msg: "Renew /",
+        uid,
+        name,
+        token
     })
 
 }
