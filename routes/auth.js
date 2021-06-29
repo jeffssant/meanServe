@@ -1,4 +1,5 @@
 const {Router} = require('express');
+const { check } = require('express-validator');
 const { newuser, loginUser, renewTk } = require('../controllers/auth.controller');
 
 const router = Router();
@@ -7,7 +8,10 @@ const router = Router();
 router.post('/new', newuser)
 
 //Login usuario
-router.post('/', loginUser)
+router.post('/', [
+    check('email', 'Email é obrigatório').isEmail(),
+    check('password', 'Senha é obrigatória').isLength({min: 6})
+] , loginUser)
 
 //Validar e revalidar Token
 router.get('/renew', renewTk)
