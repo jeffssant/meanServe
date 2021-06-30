@@ -40,6 +40,7 @@ const newuser = async(req, res = response) => {
             ok: true,
             uid: dbUser.id,
             name,
+            email,
             token
         })
 
@@ -93,6 +94,7 @@ const loginUser = async(req, res = response) => {
             ok: true,
             uid: dbUser.id,
             name: dbUser.name,
+            email: dbUser.email,
             token
         })
         
@@ -108,16 +110,21 @@ const loginUser = async(req, res = response) => {
 
 const renewTk = async(req, res = response) => {
 
-    const {uid, name} = req;
+    const {uid} = req;
+
+    //Pegar email da base
+    const dbUser= await User.findById(uid);
+
 
     //JWT
-    const token = await JWTGen(uid, name);
+    const token = await JWTGen(uid, dbUser.name);
     
     return res.json({
         ok: true,
         msg: "Renew /",
         uid,
-        name,
+        name: dbUser.name,
+        email: dbUser.email,
         token
     })
 
